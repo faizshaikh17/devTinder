@@ -6,6 +6,7 @@ const fs = require('fs')
 const app = express();
 
 const { adminAuthentication } = require('./middlewares/auth');
+const { errorHandler } = require('./middlewares/errorhandler');
 
 app.use('/admin', adminAuthentication)
 
@@ -18,8 +19,11 @@ app.get('/admin/delAllData', (req, res) => {
 })
 
 app.get('/user', (req, res) => {
+    throw new Error;
     res.send("hello");
 })
+
+app.use('/', errorHandler)
 
 
 app.listen(port);
