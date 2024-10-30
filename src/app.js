@@ -13,16 +13,37 @@ dbConnection()
     })
     .catch((err) => console.log('Database not connected'));
 
+app.use(express.json());
+
+app.get('/user', async (req, res) => {
+
+    try {
+        const userEmailId = req.body.emailId;
+        const user = await User.find({ emailId: userEmailId });
+        res.send(user);
+    }
+    catch {
+        res.status(400).send("Something went wrong");
+    }
+});
+
+
+app.get('/userOne', async (req, res) => {
+
+    try {
+        const userLastName = req.body.lastName;
+        const user = await User.findOne({ lastName: userLastName });
+        res.send(user);
+    }
+    catch {
+        res.status(400).send("Something went wrong");
+    }
+});
+
 
 app.post('/signup', async (req, res) => {
-    const userObj = {
-        firstName: "Faiz",
-        lastName: "Shaikh",
-        age: "23",
-        emailId: "faiz.shaikh.com",
-        password: "F@iz0017"
-    };
-    const user = new User(userObj);
+
+    const user = new User(req.body);
     await user.save();
 
     res.send('user added!!')
