@@ -27,6 +27,16 @@ app.get('/user', async (req, res) => {
     }
 });
 
+app.get("/userId", async (req, res) => {
+    try {
+        const userId = req.body._id;
+        const user = await User.findById({ _id: userId })
+        res.send(user)
+    } catch (error) {
+        res.status(400).send("Something went wrong");
+    }
+})
+
 
 app.get('/userOne', async (req, res) => {
 
