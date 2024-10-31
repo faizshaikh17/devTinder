@@ -51,6 +51,17 @@ app.get('/userOne', async (req, res) => {
 });
 
 
+app.delete("/userDelete", async (req, res) => {
+    try {
+        const userDelId = req.body._id;
+        const user = await User.deleteMany({});
+        res.send(user);
+    } catch (error) {
+        res.status(400).send("Something went wrong");
+    }
+})
+
+
 app.post('/signup', async (req, res) => {
 
     const user = new User(req.body);
