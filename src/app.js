@@ -61,6 +61,27 @@ app.delete("/userDelete", async (req, res) => {
     }
 })
 
+app.put("/userUpdate", async (req, res) => {
+    try {
+        const userUpdate = req.body.firstName;
+        const user = await User.updateMany({ firstName: userUpdate });
+        res.send(user);
+    } catch (error) {
+        res.status(400).send("Something went wrong");
+    }
+})
+
+app.patch("/userPatch", async (req, res) => {
+    try {
+        const userEmailId = req.body.emailId;
+        const userId = req.body._id;
+        const user = await User.findByIdAndUpdate(userId, { emailId: userEmailId });
+        res.send("upadted Succesfully!!");
+    } catch (error) {
+        res.status(400).send("Something went wrong");
+    }
+})
+
 
 app.post('/signup', async (req, res) => {
 
