@@ -73,9 +73,9 @@ app.put("/userUpdate", async (req, res) => {
 
 app.patch("/userPatch", async (req, res) => {
     try {
-        const userEmailId = req.body.emailId;
+        const userFirstName = req.body.firstName;
         const userId = req.body._id;
-        const user = await User.findByIdAndUpdate(userId, { emailId: userEmailId });
+        const user = await User.findByIdAndUpdate(userId, { firstName: userFirstName });
         res.send("upadted Succesfully!!");
     } catch (error) {
         res.status(400).send("Something went wrong");
@@ -85,10 +85,16 @@ app.patch("/userPatch", async (req, res) => {
 
 app.post('/signup', async (req, res) => {
 
-    const user = new User(req.body);
-    await user.save();
+    try {
+        const user = new User(req.body);
+        await user.save();
 
-    res.send('user added!!')
+        res.send('user added!!')
+    }
+    catch (err) {
+        res.status(400).send(err.message);
+
+    }
 
 });
 
