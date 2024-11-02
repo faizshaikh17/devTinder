@@ -6,6 +6,9 @@ const { dbConnection } = require('./config/database');
 
 const { User } = require("./models/user");
 const { ReturnDocument } = require('mongodb');
+const { isUserValidated } = require("./utils/validation");
+const bcrypt = require('bcrypt');
+
 
 dbConnection()
     .then(() => {
@@ -15,6 +18,32 @@ dbConnection()
     .catch((err) => console.log('Database not connected'));
 
 app.use(express.json());
+
+
+app.post('/signup', async (req, res) => {
+
+    //Validation
+    try {
+        const { firstName, lastName, emailId, password } = req.body
+        isUserValidated(req);
+        const hashPassword = await bcrypt.hash(password, 10)
+        const user = new User({
+            firstName,
+            lastName,
+            emailId,
+            password: hashPassword,
+        });
+        await user.save();
+        console.log(hashPassword);
+
+        res.send('user added!!')
+    }
+    catch (err) {
+        res.status(400).send(err.message);
+
+    }
+
+});
 
 app.get('/user', async (req, res) => {
 
@@ -103,18 +132,28 @@ app.patch("/user/:userId", async (req, res) => {
     }
 })
 
-app.post('/signup', async (req, res) => {
 
+
+app.post("/login", async (req, res) => {
     try {
-        const user = new User(req.body);
-        await user.save();
+        const { emailId, password } = req.body;
 
-        res.send('user added!!')
+        const findUserId = await User.findOne({ emailId: emailId });
+
+        if (!findUserId) {
+            throw new Error("Invalid Credentials");
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, findUserId.password);
+        if (!isPasswordValid) {
+            throw new Error("Invalid Credentials")
+        }
+
+        res.send("User Found");
+
+    } catch (error) {
+        res.status(400).send(error.message);
     }
-    catch (err) {
-        res.status(400).send(err.message);
+})
 
-    }
-
-});
 
