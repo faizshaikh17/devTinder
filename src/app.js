@@ -4,10 +4,13 @@ const port = 3000;
 
 const { dbConnection } = require('./config/database');
 
-const { User } = require("./models/user");
+const User = require("./models/user");
 const { ReturnDocument } = require('mongodb');
 const { isUserValidated } = require("./utils/validation");
 const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+const { userAuth } = require('./middlewares/auth');
 
 
 dbConnection()
@@ -18,6 +21,7 @@ dbConnection()
     .catch((err) => console.log('Database not connected'));
 
 app.use(express.json());
+app.use(cookieParser());
 
 
 app.post('/signup', async (req, res) => {
@@ -138,22 +142,44 @@ app.post("/login", async (req, res) => {
     try {
         const { emailId, password } = req.body;
 
-        const findUserId = await User.findOne({ emailId: emailId });
+        const user = await User.findOne({ emailId: emailId });
 
-        if (!findUserId) {
+        if (!user) {
             throw new Error("Invalid Credentials");
         }
 
-        const isPasswordValid = await bcrypt.compare(password, findUserId.password);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             throw new Error("Invalid Credentials")
         }
 
+        const token = await jwt.sign({ _id: user._id }, "devTinder", { expiresIn: "1h" })
+        if (!token) {
+            throw new Error("token not Valid")
+        }
+        res.cookie("token", token, { expires: new Date(Date.now() + 3600000) });
         res.send("User Found");
 
     } catch (error) {
         res.status(400).send(error.message);
     }
+})
+
+
+app.get("/profile", userAuth, async (req, res) => {
+    try {
+        const user = req.user;
+        res.send(user);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+})
+
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+
+    const user = req.user;
+
+    res.send(user.firstName + " Connection")
 })
 
 

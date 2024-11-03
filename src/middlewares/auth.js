@@ -1,14 +1,23 @@
-const adminAuthentication = (req, res, next) => {
-    const token = 'fz17';
-    const adminAuth = token === 'fz17';
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
-    if (!adminAuth) {
-        res.status(404).send('something went wrong');
-    }
-    else {
+const userAuth = async (req, res, next) => {
+    try {
+        const { token } = req.cookies;
+
+        const decodedObj = await jwt.verify(token, "devTinder");
+
+        const { _id } = decodedObj;
+        const user = await User.findById(_id);
+        req.user = user;
+        if (!user) {
+            throw new Error("user not found")
+        }
         next();
+    } catch (err) {
+        res.status(400).send(err.message);
     }
 
 }
 
-module.exports = { adminAuthentication }
+module.exports = { userAuth }
