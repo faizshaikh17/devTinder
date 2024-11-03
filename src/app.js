@@ -9,8 +9,8 @@ const { ReturnDocument } = require('mongodb');
 const { isUserValidated } = require("./utils/validation");
 const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
 const { userAuth } = require('./middlewares/auth');
+const jwt = require('jsonwebtoken')
 
 
 dbConnection()
@@ -141,27 +141,31 @@ app.patch("/user/:userId", async (req, res) => {
 app.post("/login", async (req, res) => {
     try {
         const { emailId, password } = req.body;
+        // const cookies = req.cookies;
 
         const user = await User.findOne({ emailId: emailId });
-
         if (!user) {
-            throw new Error("Invalid Credentials");
+            throw new Error("Invalid Credentials")
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await user.validatePassword(password);
+
         if (!isPasswordValid) {
             throw new Error("Invalid Credentials")
         }
 
-        const token = await jwt.sign({ _id: user._id }, "devTinder", { expiresIn: "1h" })
+        const token = await user.getJWT();
+        // console.log(token);
+
         if (!token) {
-            throw new Error("token not Valid")
+            throw new Error("Token not valid")
         }
-        res.cookie("token", token, { expires: new Date(Date.now() + 3600000) });
-        res.send("User Found");
+
+        res.cookie("token", token);
+        res.send("user Found")
 
     } catch (error) {
-        res.status(400).send(error.message);
+        res.status(400).send(error.message)
     }
 })
 
