@@ -11,4 +11,15 @@ const isUserValidated = (req) => {
     }
 }
 
-module.exports = { isUserValidated }
+const validateUserProfileData = (req) => {
+    const allowedUpdates = ["firstName", "lastName", "age", "gender", "skills"];
+    const isUpdateAllowed = Object.keys(req.body).every(key => allowedUpdates.includes(key));
+    console.log(isUpdateAllowed)
+
+    if (!isUpdateAllowed) {
+        throw new Error("Update not allowed")
+    }
+    return isUpdateAllowed
+}
+
+module.exports = { isUserValidated, validateUserProfileData }
