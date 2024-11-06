@@ -22,4 +22,22 @@ const validateUserProfileData = (req) => {
     return isUpdateAllowed
 }
 
-module.exports = { isUserValidated, validateUserProfileData }
+const validateUpdatePassword = async (req) => {
+
+    const allowedUpdate = ["password", "newPassword"];
+    const isUpdateAllowed = Object.keys(req.body).every(key => allowedUpdate.includes(key));
+    console.log(isUpdateAllowed)
+    return isUpdateAllowed;
+}
+
+const validateForgotPassword = async (req) => {
+
+    const allowedUpdate = ["emailId", "newPassword"];
+    const isUpdateAllowed = Object.keys(req.body).every(key => allowedUpdate.includes(key));
+    console.log(isUpdateAllowed);
+    return isUpdateAllowed;
+
+}
+
+
+module.exports = { isUserValidated, validateUserProfileData, validateUpdatePassword, validateForgotPassword }
