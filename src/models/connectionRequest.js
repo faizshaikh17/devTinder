@@ -5,10 +5,13 @@ const connectionRequestSchema = new mongoose.Schema({
     fromUserId: {
         type: mongoose.Types.ObjectId,
         required: true,
+        index: true
     },
     toUserId: {
         type: mongoose.Types.ObjectId,
         required: true,
+        index: true
+
     },
     status: {
         type: String,
@@ -30,5 +33,6 @@ connectionRequestSchema.pre("save", function (next) {
     next();
 })
 
+connectionRequestSchema.index({ firstName: 1, lastName: 1 });
 
 module.exports = new mongoose.model("ConnectionRequest", connectionRequestSchema);
