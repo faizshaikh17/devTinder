@@ -12,7 +12,7 @@ userRouter.get("/user/request/recieved", userAuth, async (req, res) => {
             toUserId: loggedInUser._id,
             status: "interested",
         }).populate("fromUserId", "firstName lastName");
-        console.log(connectionRequest)
+        // console.log(connectionRequest)
 
         if (connectionRequest == "") {
             throw new Error("user not found");
@@ -25,6 +25,44 @@ userRouter.get("/user/request/recieved", userAuth, async (req, res) => {
 
     } catch (error) {
         res.status(400).send(error.message);
+    }
+})
+
+userRouter.get("/user/connection", userAuth, async (req, res) => {
+    try {
+        const loggedInUser = req.user;
+        const connectionRequest = await ConnectionRequest.find({
+            status: "accepted",
+            $or: [
+                { toUserId: loggedInUser._id },
+                { fromUserId: loggedInUser._id }
+            ]
+
+        }).populate("fromUserId", "firstName lastName").populate("toUserId", "firstName lastName")
+
+        // console.log(connectionRequest.fromUserId);
+        // console.log(loggedInUser.firstName);
+
+        if (connectionRequest == "") {
+            throw new Error("No user found");
+        }
+
+        const data = connectionRequest.map((row) => {
+            if (row.fromUserId.firstName == loggedInUser.firstName) {
+                return row.toUserId.firstName;
+            }
+            else {
+                return row.fromUserId.firstName;
+            }
+        })
+        // console.log();
+
+        res.json({
+            message: "Your connection data",
+            data
+        })
+    } catch (error) {
+        res.status(400).send("No connection found" + error.message)
     }
 })
 
