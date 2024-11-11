@@ -90,7 +90,6 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
             .skip((page - 1) * limit)
             .limit(limit);
 
-        // console.log(connectionRequest);
         res.json({
             message: "your feed",
             user
