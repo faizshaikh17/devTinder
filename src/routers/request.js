@@ -15,8 +15,7 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
         // const toUserId = new mongoose.Types.ObjectId(req.params.toUserId);
         const status = req.params.status;
 
-        console.log(fromUserId)
-        console.log(toUserId)
+
 
         const connectionRequest = new ConnectionRequest({
             fromUserId,

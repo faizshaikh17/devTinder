@@ -6,7 +6,6 @@ const userAuth = async (req, res, next) => {
         const { token } = req.cookies;
 
         const decodedObj = await jwt.verify(token, "devTinder");
-
         const { _id } = decodedObj;
         const user = await User.findById(_id);
         req.user = user;

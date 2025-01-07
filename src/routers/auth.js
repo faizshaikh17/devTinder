@@ -46,21 +46,23 @@ authRouter.post("/login", async (req, res) => {
         if (!isPasswordValid) {
             throw new Error("Invalid Credentials")
         }
+        console.log(user);
 
         const token = await user.getJWT();
-        // console.log(token);
+        console.log(token);
 
         if (!token) {
             throw new Error("Token not valid")
         }
 
         res.cookie("token", token);
-        res.send("user Found")
+        res.send(user)
 
     } catch (error) {
         res.status(400).send(error.message)
     }
 });
+
 
 authRouter.post("/logout", async (req, res) => {
     res.cookie("token", null, { expires: new Date(Date.now()) }).send("User Logged Out")
